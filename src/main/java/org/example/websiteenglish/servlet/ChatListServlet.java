@@ -16,28 +16,58 @@ public class ChatListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        resp.setContentType("application/json; charset=UTF-8");
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
+        String course = req.getParameter("course");
+        if (course == null || course.isBlank()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Курс не указан");
+            return;
+        }
 
         try (Connection conn = DatabaseConnectionUtil.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(
-                     "SELECT c.text, c.created_at, u.name " +
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT c.text, c.created_at, u.name AS user_name " +
                              "FROM comments c JOIN users u ON c.user_id = u.id " +
-                             "ORDER BY c.created_at DESC LIMIT 20"
-             )) {
+                             "WHERE c.course = ? ORDER BY c.created_at ASC")) {
 
-            List<String> jsonMessages = new ArrayList<>();
+            stmt.setString(1, course);
+            ResultSet rs = stmt.executeQuery();
+
+            StringBuilder json = new StringBuilder("[");
+            boolean first = true;
+
             while (rs.next()) {
-                String name = rs.getString("name");
-                String text = rs.getString("text").replace("\"", "\\\"");
+                String name = rs.getString("user_name");
+                if (name == null || name.isEmpty()) name = "Аноним";
+                String text = rs.getString("text");
                 String time = rs.getTimestamp("created_at").toString();
-                jsonMessages.add(String.format("{\"name\":\"%s\",\"text\":\"%s\",\"time\":\"%s\"}", name, text, time));
+
+                if (!first) json.append(",");
+                first = false;
+
+                json.append("{")
+                        .append("\"name\":\"").append(escapeJson(name)).append("\",")
+                        .append("\"text\":\"").append(escapeJson(text)).append("\",")
+                        .append("\"time\":\"").append(escapeJson(time)).append("\"")
+                        .append("}");
             }
 
-            PrintWriter out = resp.getWriter();
-            out.print("[" + String.join(",", jsonMessages) + "]");
+            json.append("]");
+            resp.getWriter().print(json.toString());
+
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            resp.sendError(500, e.getMessage());
         }
+    }
+
+    private String escapeJson(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "")
+                .replace("\t", "\\t");
     }
 }
