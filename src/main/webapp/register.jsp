@@ -1,51 +1,36 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
     <title>Регистрация</title>
+    <link rel="stylesheet" href="auth.css">
 </head>
 <body>
-<h2>Регистрация</h2>
 
-<form action="register" method="post" id="registerForm">
-    <label>Имя:</label><br>
-    <input type="text" name="name" required><br><br>
+<div class="container">
+    <h2>Регистрация</h2>
 
-    <label>Email:</label><br>
-    <input type="email" name="email" id="emailInput" required><br>
-    <span id="emailError" style="color:red;"></span><br><br>
+    <% String error = (String) request.getAttribute("error"); %>
+    <% if (error != null) { %>
+    <div id="errorMsg"><%= error %></div>
+    <% } %>
 
-    <label>Пароль:</label><br>
-    <input type="password" name="password" required><br><br>
+    <form action="register" method="post">
+        <label>Имя:</label>
+        <input type="text" name="name" required>
 
-    <input type="submit" value="Зарегистрироваться">
-</form>
+        <label>Email:</label>
+        <input type="email" name="email" required>
 
-<p>Уже есть аккаунт? <a href="login.jsp">Войти</a></p>
+        <label>Пароль:</label>
+        <input type="password" name="password" required>
 
-<script>
-    const emailInput = document.getElementById('emailInput');
-    const emailError = document.getElementById('emailError');
-    const form = document.getElementById('registerForm');
+        <input type="submit" value="Зарегистрироваться">
+    </form>
 
-    emailInput.addEventListener('blur', function() {
-        const email = this.value;
-        if (!email) return;
+    <p>Уже есть аккаунт? <a href="login.jsp">Войти</a></p>
+</div>
 
-        const contextPath = '<%= request.getContextPath() %>';
-        fetch(contextPath + '/check/email?email=' + encodeURIComponent(email))
-                .then(res => res.text())
-            .then(msg => {
-                emailError.textContent = msg;
-            });
-    });
-
-    // Предотвратим отправку формы, если email занят
-    form.addEventListener('submit', function(event) {
-        if (emailError.textContent) {
-            event.preventDefault();
-            alert("Исправьте ошибки перед отправкой формы.");
-        }
-    });
-</script>
 </body>
 </html>

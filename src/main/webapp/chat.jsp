@@ -4,32 +4,93 @@
 <head>
     <meta charset="UTF-8">
     <title>Отзывы студентов</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="chat.css">
 </head>
 <body>
 
-<h1>Отзывы студентов</h1>
-<p>Выберите курс, чтобы открыть чат и прочитать отзывы.</p>
+<!-- ===== HEADER ===== -->
+<header class="hdr">
+    <div class="wrap">
+        <div class="logo"><a href="index.jsp">Home English School</a></div>
 
-<div class="course-select">
-    <button class="course-btn" data-course="basic">🗣️ Разговорный — Базовый</button>
-    <button class="course-btn" data-course="advanced">💬 Разговорный — Продвинутый</button>
-    <button class="course-btn" data-course="pilots">✈️ Английский для пилотов</button>
-    <button class="course-btn" data-course="dispatchers">🛫 Английский для диспетчеров</button>
-</div>
+        <nav class="menu">
+            <a href="index.jsp#courses">Курсы</a>
+            <a href="index.jsp#advantages">Преимущества</a>
+            <a href="index.jsp#process">Как учим</a>
+            <a href="chat.jsp">Отзывы</a>
+        </nav>
 
-<div id="chat-section" class="hidden chat-box">
-    <h2 id="chat-title"></h2>
+        <div class="auth">
+            <%
+                String userName = (String) session.getAttribute("userName");
+                if (userName != null) {
+            %>
+            <span>Привет, <a href="profile.jsp"><%= userName %></a></span>
+            <button class="btnn quit" onclick="window.location.href='logout'">Выйти</button>
+            <% } else { %>
+            <button class="btnn" onclick="window.location.href='register.jsp'">Регистрация</button>
+            <button class="btnn" onclick="window.location.href='login.jsp'">Войти</button>
+            <% } %>
+        </div>
+    </div>
+</header>
 
-    <div id="messages" class="messages-box"></div>
+<!-- ===== MAIN CONTENT ===== -->
+<section class="section">
+    <div class="wrap center">
+        <h1>Отзывы студентов</h1>
+        <p>Выберите курс, чтобы прочитать отзывы и оставить свой комментарий</p>
 
-    <form id="chatForm" class="chat-input">
-        <textarea id="chatInput" placeholder="Напишите сообщение..." required></textarea>
-        <button type="submit">Отправить</button>
-    </form>
-</div>
+        <!-- Курсы в виде карточек -->
+        <div class="course-grid">
+            <div class="course-card" data-course="basic">
+                <div class="emoji">🗣️</div>
+                <h3>Разговорный — Базовый</h3>
+                <p>Отзывы о базовом курсе разговорного английского</p>
+            </div>
 
-<a href="index.jsp" class="back-link">← На главную</a>
+            <div class="course-card" data-course="advanced">
+                <div class="emoji">💬</div>
+                <h3>Разговорный — Продвинутый</h3>
+                <p>Отзывы о продвинутом курсе разговорного английского</p>
+            </div>
+
+            <div class="course-card" data-course="pilots">
+                <div class="emoji">✈️</div>
+                <h3>Английский для пилотов</h3>
+                <p>Отзывы о курсе авиационного английского для пилотов</p>
+            </div>
+
+            <div class="course-card" data-course="dispatchers">
+                <div class="emoji">🛫</div>
+                <h3>Английский для диспетчеров</h3>
+                <p>Отзывы о курсе английского для диспетчеров</p>
+            </div>
+        </div>
+
+        <!-- Секция с комментариями -->
+        <div id="chat-section" class="hidden chat-box">
+            <div class="chat-header">
+                <h2 id="chat-title"></h2>
+                <button class="close-chat" onclick="closeChatSection()">&times;</button>
+            </div>
+
+            <div id="messages" class="messages-box"></div>
+
+            <form id="chatForm" class="chat-input">
+                <textarea id="chatInput" placeholder="Напишите ваш отзыв о курсе..." required></textarea>
+                <button type="submit">Отправить</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<footer class="foot">
+    <div class="wrap center">
+        <p>© 2025 Home English School</p>
+    </div>
+</footer>
 
 <script>
     const messagesDiv = document.getElementById("messages");
@@ -40,52 +101,107 @@
 
     let selectedCourse = null;
     let allMessages = [];
+    let refreshInterval = null;
 
-    // Выбор курса
-    document.querySelectorAll(".course-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            selectedCourse = btn.dataset.course;
-            chatTitle.textContent = btn.textContent;
+    // Маппинг курсов для отображения
+    const courseNames = {
+        'basic': '🗣️ Разговорный — Базовый',
+        'advanced': '💬 Разговорный — Продвинутый',
+        'pilots': '✈️ Английский для пилотов',
+        'dispatchers': '🛫 Английский для диспетчеров'
+    };
+
+    // Выбор курса при клике на карточку
+    document.querySelectorAll(".course-card").forEach(card => {
+        card.addEventListener("click", () => {
+            selectedCourse = card.dataset.course;
+            const courseName = card.querySelector("h3").textContent;
+            chatTitle.textContent = courseName;
             chatSection.classList.remove("hidden");
+
+            // Прокрутка к секции с комментариями
+            chatSection.scrollIntoView({ behavior: "smooth", block: "start" });
+
+            // Запускаем загрузку и автообновление
             loadMessages();
+            startAutoRefresh();
         });
     });
 
-    // Загрузка сообщений
-    async function loadMessages() {
-        try {
-            const resp = await fetch("chat/list");
-            if (!resp.ok) throw new Error("Ошибка загрузки");
-            const data = await resp.json();
-
-            // ✅ фильтруем по курсу
-            allMessages = data.filter(m => m.course === selectedCourse);
-            renderMessages();
-        } catch (e) {
-            messagesDiv.innerHTML = `<p class="error">Не удалось загрузить сообщения.</p>`;
-            console.error("Ошибка:", e);
+    // Закрытие секции с комментариями
+    function closeChatSection() {
+        chatSection.classList.add("hidden");
+        selectedCourse = null;
+        allMessages = [];
+        if (refreshInterval) {
+            clearInterval(refreshInterval);
+            refreshInterval = null;
         }
     }
 
-    // Отображение
+    // Загрузка сообщений
+    async function loadMessages() {
+        if (!selectedCourse) return;
+
+        try {
+            // Правильное кодирование параметра в URL
+            const encodedCourse = encodeURIComponent(selectedCourse);
+            const resp = await fetch('chat/list?course=' + encodedCourse);
+            if (!resp.ok) {
+                if (resp.status === 400) {
+                    // Если нет комментариев, показываем пустое состояние
+                    allMessages = [];
+                    renderMessages();
+                    return;
+                }
+                throw new Error("Ошибка загрузки");
+            }
+            const data = await resp.json();
+
+            // Сохраняем все сообщения
+            allMessages = Array.isArray(data) ? data : [];
+            renderMessages();
+        } catch (e) {
+            console.error("Ошибка загрузки:", e);
+            messagesDiv.innerHTML = '<p class="error">Не удалось загрузить отзывы. Попробуйте обновить страницу.</p>';
+        }
+    }
+
+    // Отображение сообщений
     function renderMessages() {
-        if (!allMessages.length) {
-            messagesDiv.innerHTML = `<p class="no-messages">Пока нет сообщений. Будьте первым!</p>`;
+        if (!allMessages || allMessages.length === 0) {
+            messagesDiv.innerHTML = '<p class="no-messages">Пока нет отзывов по этому курсу. Будьте первым, кто оставит отзыв!</p>';
             return;
         }
 
         messagesDiv.innerHTML = allMessages.map(m => {
-            const date = new Date(m.time).toLocaleString();
-            return `
-                <div class="message">
-                    <div class="author">${m.name}</div>
-                    <div class="text">${m.text}</div>
-                    <div class="time">${date}</div>
-                </div>
-            `;
+            const date = new Date(m.time).toLocaleString('ru-RU', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            const name = escapeHtml(m.name || 'Аноним');
+            const text = escapeHtml(m.text);
+            return '<div class="message">' +
+                '<div class="message-header">' +
+                '<div class="author">' + name + '</div>' +
+                '<div class="time">' + date + '</div>' +
+                '</div>' +
+                '<div class="text">' + text + '</div>' +
+                '</div>';
         }).join("");
 
+        // Автоматическая прокрутка к последнему сообщению
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    // Экранирование HTML для безопасности
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     // Отправка сообщения
@@ -95,32 +211,54 @@
         if (!text || !selectedCourse) return;
 
         try {
+            // Создаем URLSearchParams с правильной кодировкой UTF-8
+            const params = new URLSearchParams();
+            params.append('text', text);
+            params.append('course', selectedCourse);
+
             const resp = await fetch("chat/send", {
                 method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams({ text, course: selectedCourse })
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                },
+                body: params
             });
 
             if (resp.ok) {
                 chatInput.value = "";
+                // Загружаем обновленные сообщения
                 await loadMessages();
             } else if (resp.status === 401) {
-                alert("Чтобы писать — войдите в систему.");
+                alert("Чтобы оставить отзыв, войдите в систему.");
+                window.location.href = 'login.jsp';
             } else {
-                alert("Ошибка при отправке");
+                const errorText = await resp.text();
+                alert("Ошибка при отправке отзыва: " + errorText);
             }
         } catch (err) {
             console.error(err);
-            alert("Ошибка сети");
+            alert("Ошибка сети. Проверьте подключение к интернету.");
         }
     });
 
-    // Автообновление
-    setInterval(() => {
-        if (!chatSection.classList.contains("hidden")) {
-            loadMessages();
+    // Автообновление каждые 5 секунд
+    function startAutoRefresh() {
+        if (refreshInterval) {
+            clearInterval(refreshInterval);
         }
-    }, 8000);
+        refreshInterval = setInterval(() => {
+            if (!chatSection.classList.contains("hidden") && selectedCourse) {
+                loadMessages();
+            }
+        }, 5000);
+    }
+
+    // Остановка автообновления при закрытии страницы
+    window.addEventListener("beforeunload", () => {
+        if (refreshInterval) {
+            clearInterval(refreshInterval);
+        }
+    });
 </script>
 
 </body>

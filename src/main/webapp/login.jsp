@@ -4,21 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Вход</title>
+    <link rel="stylesheet" href="auth.css">
 </head>
 <body>
-<h2>Вход</h2>
 
-<form method="post" action="login">
-    <label>Email:</label><br>
-    <input type="email" name="email" placeholder="Введите email" required><br><br>
+<div class="container">
+    <h2>Вход</h2>
 
-    <label>Пароль:</label><br>
-    <input type="password" name="password" placeholder="Введите пароль" required><br><br>
+    <% String error = (String) request.getAttribute("error"); %>
+    <% if (error != null) { %>
+    <div id="errorMsg"><%= error %></div>
+    <% } %>
 
-    <input type="submit" value="Войти">
-</form>
+    <form method="post" action="login">
+        <label>Email:</label>
+        <input type="email" name="email" placeholder="Введите email" required>
 
-<p>Нет аккаунта? <a href="register.jsp">Регистрация</a></p>
+        <label>Пароль:</label>
+        <input type="password" name="password" placeholder="Введите пароль" required>
+
+        <input type="submit" value="Войти">
+    </form>
+
+    <p>Нет аккаунта? <a href="register.jsp">Регистрация</a></p>
+</div>
 
 </body>
 </html>
