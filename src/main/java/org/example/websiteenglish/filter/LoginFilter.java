@@ -14,25 +14,32 @@ public class LoginFilter implements Filter {
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
-        HttpSession session = req.getSession(false);
+
         String uri = req.getRequestURI();
+        HttpSession session = req.getSession(false);
 
-        // Разрешаем доступ к страницам логина, регистрации и статическим ресурсам
-        if (uri.endsWith("login") || uri.endsWith("login.jsp") || uri.endsWith("register.jsp")
-                || uri.matches(".*\\.(css|js|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)$")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-
-        // Если пользователь не вошел, перенаправляем на логин
         boolean loggedIn = session != null && session.getAttribute("userId") != null;
-        if (!loggedIn) {
+
+        boolean publicPage =
+                uri.equals("/") ||
+                        uri.endsWith("/login") ||
+                        uri.endsWith("login.jsp") ||
+                        uri.endsWith("/register") ||
+                        uri.endsWith("register.jsp") ||
+                        uri.matches(".*\\.(css|js|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|ico)$");
+
+        // ✅ Если пользователь не авторизован и это не public — редиректим на login
+        if (!loggedIn && !publicPage) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
-        // Если вошел — пропускаем дальше
+        // ✅ Если он пришёл на "/" и он не авторизован — редирект на login
+        if (!loggedIn && uri.equals("/")) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
         chain.doFilter(request, response);
     }
 }

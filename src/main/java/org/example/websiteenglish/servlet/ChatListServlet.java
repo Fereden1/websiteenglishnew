@@ -5,17 +5,20 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import org.example.websiteenglish.entity.Comment;
 import org.example.websiteenglish.service.CommentService;
-import org.example.websiteenglish.service.impl.CommentServiceImpl;
-import org.example.websiteenglish.utils.DatabaseConnectionUtil;
 
 import java.io.IOException;
-import java.sql.*;
 import java.util.List;
 
 @WebServlet("/chat/list")
-public class ChatListServlet extends HttpServlet {
+public class ChatListServlet extends BaseServlet {
 
-    private final CommentService commentService = new CommentServiceImpl();
+    private CommentService commentService;
+    
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        this.commentService = getServiceContainer().getService(CommentService.class);
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -32,7 +35,7 @@ public class ChatListServlet extends HttpServlet {
         }
 
         try {
-            List<Comment> comments = commentService.getCommentsByCourse(courseType);
+            List<Comment> comments = commentService.getAllCommentsForCourse(courseType);
 
             StringBuilder json = new StringBuilder("[");
             boolean first = true;

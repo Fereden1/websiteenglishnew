@@ -1,40 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Отзывы студентов</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="chat.css">
-</head>
-<body>
-
-<!-- ===== HEADER ===== -->
-<header class="hdr">
-    <div class="wrap">
-        <div class="logo"><a href="index.jsp">Home English School</a></div>
-
-        <nav class="menu">
-            <a href="index.jsp#courses">Курсы</a>
-            <a href="index.jsp#advantages">Преимущества</a>
-            <a href="index.jsp#process">Как учим</a>
-            <a href="chat.jsp">Отзывы</a>
-        </nav>
-
-        <div class="auth">
-            <%
-                String userName = (String) session.getAttribute("userName");
-                if (userName != null) {
-            %>
-            <span>Привет, <a href="profile.jsp"><%= userName %></a></span>
-            <button class="btnn quit" onclick="window.location.href='logout'">Выйти</button>
-            <% } else { %>
-            <button class="btnn" onclick="window.location.href='register.jsp'">Регистрация</button>
-            <button class="btnn" onclick="window.location.href='login.jsp'">Войти</button>
-            <% } %>
-        </div>
-    </div>
-</header>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<c:set var="pageTitle" value="Отзывы студентов" scope="request" />
+<jsp:include page="/WEB-INF/fragments/header.jsp" />
+<link rel="stylesheet" href="chat.css">
 
 <!-- ===== MAIN CONTENT ===== -->
 <section class="section">
@@ -85,12 +53,6 @@
         </div>
     </div>
 </section>
-
-<footer class="foot">
-    <div class="wrap center">
-        <p>© 2025 Home English School</p>
-    </div>
-</footer>
 
 <script>
     const messagesDiv = document.getElementById("messages");
@@ -261,5 +223,4 @@
     });
 </script>
 
-</body>
-</html>
+<jsp:include page="/WEB-INF/fragments/footer.jsp" />

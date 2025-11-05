@@ -12,23 +12,31 @@ import java.util.stream.Collectors;
 
 public class UserServiceImpl implements UserService {
 
-    private final UserDao userDao = new UserDaoImpl();
+    private final UserDao userDao;
+    
+    // Конструктор для Dependency Injection
+    public UserServiceImpl(UserDao userDao) {
+        this.userDao = userDao;
+    }
+    
+    // Конструктор по умолчанию для обратной совместимости
+    public UserServiceImpl() {
+        this.userDao = new UserDaoImpl();
+    }
 
     @Override
-    public List<UserDto> getAll() {
+    public List<UserDto> getAllUsers() {
         return userDao.getAll().stream()
                 .map(u -> new UserDto(u.getEmail(), u.getName()))
                 .collect(Collectors.toList());
     }
 
-    // ------------------ НОВЫЙ метод signUp ------------------
-    public void signUp(String name, String email, String password) {
+    @Override
+    public void registerNewUser(String name, String email, String password) {
         String encryptedPassword = PasswordUtil.encrypt(password);
         User user = new User(email, encryptedPassword, name);
         userDao.save(user);
     }
-    // ---------------------------------------------------------
-
 
     @Override
     public User findByLogin(String email) {
@@ -41,7 +49,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean authenticate(String email, String password) {
+    public boolean checkPassword(String email, String password) {
         User user = userDao.getByLogin(email);
         if (user == null) return false;
         String encryptedPassword = PasswordUtil.encrypt(password);
@@ -49,7 +57,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getByEmail(String email) {
+    public User findUserByEmail(String email) {
         return userDao.getByLogin(email);
     }
 

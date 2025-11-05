@@ -1,16 +1,31 @@
 package org.example.websiteenglish.servlet;
 
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import org.example.websiteenglish.container.ServiceContainer;
 import org.example.websiteenglish.service.UserService;
-import org.example.websiteenglish.service.impl.UserServiceImpl;
 
 @WebServlet(name = "login", urlPatterns = "/login")
 public class LoginServlet extends HttpServlet {
 
-    private final UserService userService = new UserServiceImpl();
+    private UserService userService;
+    
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        // Получаем контейнер сервисов из ServletContext (инициализирован через WebListener)
+        ServletContext context = getServletContext();
+        ServiceContainer container = (ServiceContainer) context.getAttribute("serviceContainer");
+        if (container != null) {
+            this.userService = container.getService(UserService.class);
+        } else {
+            // Fallback для обратной совместимости
+            throw new ServletException("Service container not initialized");
+        }
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
@@ -28,8 +43,8 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        if (userService.authenticate(email, password)) {
-            var user = userService.getByEmail(email);
+        if (userService.checkPassword(email, password)) {
+            var user = userService.findUserByEmail(email);
 
             HttpSession session = req.getSession(true); // создаём новую, если нет
             session.setAttribute("userEmail", email);

@@ -5,16 +5,21 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import org.example.websiteenglish.entity.User;
 import org.example.websiteenglish.service.UserService;
-import org.example.websiteenglish.service.impl.UserServiceImpl;
 import org.example.websiteenglish.utils.PasswordUtil;
 
 
 import java.io.IOException;
 
 @WebServlet(name = "profileServlet", urlPatterns = {"/profile", "/profile/edit", "/profile/delete"})
-public class ProfileServlet extends HttpServlet {
+public class ProfileServlet extends BaseServlet {
 
-    private final UserService userService = new UserServiceImpl();
+    private UserService userService;
+    
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        this.userService = getServiceContainer().getService(UserService.class);
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -27,7 +32,7 @@ public class ProfileServlet extends HttpServlet {
         }
 
         String email = (String) session.getAttribute("userEmail");
-        User user = userService.getByEmail(email);
+        User user = userService.findUserByEmail(email);
 
         String path = req.getServletPath();
         switch (path) {
@@ -60,12 +65,7 @@ public class ProfileServlet extends HttpServlet {
 
         String email = (String) session.getAttribute("userEmail");
 
-        User user = userService.getByEmail(email);
-
-        req.setAttribute("user", user);
-        req.getRequestDispatcher("/profile.jsp").forward(req, resp);
-
-        User currentUser = userService.getByEmail(email);
+        User currentUser = userService.findUserByEmail(email);
 
         String name = req.getParameter("name");
         String password = req.getParameter("password");

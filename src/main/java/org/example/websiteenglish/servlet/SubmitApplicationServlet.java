@@ -3,15 +3,21 @@ package org.example.websiteenglish.servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import org.example.websiteenglish.dao.impl.ApplicationDaoImpl;
 import org.example.websiteenglish.entity.Application;
+import org.example.websiteenglish.service.ApplicationService;
 
 import java.io.IOException;
 
 @WebServlet("/submitApplication")
-public class SubmitApplicationServlet extends HttpServlet {
+public class SubmitApplicationServlet extends BaseServlet {
 
-    private final ApplicationDaoImpl applicationDao = new ApplicationDaoImpl();
+    private ApplicationService applicationService;
+    
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        this.applicationService = getServiceContainer().getService(ApplicationService.class);
+    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -41,16 +47,25 @@ public class SubmitApplicationServlet extends HttpServlet {
             throw new IllegalArgumentException("Неверный тип курса");
         }
 
+        // Проверка на дубликат заявки по конкретному идентификатору курса
+        if (applicationService.userAlreadyAppliedForCourse(userId, courseTypeRaw)) {
+            session.setAttribute("errorMessage", "Вы уже отправили заявку на этот курс. Пожалуйста, выберите другой курс.");
+            resp.sendRedirect("index.jsp");
+            return;
+        }
+
         Application app = new Application();
         app.setUserId(userId);
         app.setCourseType(courseType);
+        app.setCourseIdentifier(courseTypeRaw); // Сохраняем конкретный идентификатор курса
         app.setStudentName(studentName);
         app.setEmail(email);
         app.setPhone(phone);
         app.setMessage(message);
 
-        applicationDao.save(app);
+        applicationService.save(app);
 
+        session.setAttribute("successMessage", "Заявка успешно отправлена!");
         resp.sendRedirect("index.jsp");
     }
 }

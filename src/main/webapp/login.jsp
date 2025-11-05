@@ -1,20 +1,14 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Вход</title>
-    <link rel="stylesheet" href="auth.css">
-</head>
-<body>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<c:set var="pageTitle" value="Вход" scope="request" />
+<jsp:include page="/WEB-INF/fragments/authHeader.jsp" />
 
 <div class="container">
     <h2>Вход</h2>
 
-    <% String error = (String) request.getAttribute("error"); %>
-    <% if (error != null) { %>
-    <div id="errorMsg"><%= error %></div>
-    <% } %>
+    <c:if test="${requestScope.error != null}">
+        <div id="errorMsg"><c:out value="${requestScope.error}" /></div>
+    </c:if>
 
     <form method="post" action="login">
         <label>Email:</label>
@@ -29,5 +23,4 @@
     <p>Нет аккаунта? <a href="register.jsp">Регистрация</a></p>
 </div>
 
-</body>
-</html>
+<jsp:include page="/WEB-INF/fragments/authFooter.jsp" />

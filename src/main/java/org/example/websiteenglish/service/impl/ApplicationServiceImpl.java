@@ -9,7 +9,17 @@ import java.util.List;
 
 public class ApplicationServiceImpl implements ApplicationService {
 
-    private final ApplicationDao applicationDao = new ApplicationDaoImpl();
+    private final ApplicationDao applicationDao;
+    
+    // Конструктор для Dependency Injection
+    public ApplicationServiceImpl(ApplicationDao applicationDao) {
+        this.applicationDao = applicationDao;
+    }
+    
+    // Конструктор по умолчанию для обратной совместимости
+    public ApplicationServiceImpl() {
+        this.applicationDao = new ApplicationDaoImpl();
+    }
 
     @Override
     public void save(Application application) {
@@ -19,5 +29,15 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public List<Application> findByUserId(int userId) {
         return applicationDao.findByUserId(userId);
+    }
+
+    @Override
+    public boolean userAlreadyAppliedForCourseType(int userId, String courseType) {
+        return applicationDao.userAlreadyAppliedForCourseType(userId, courseType);
+    }
+
+    @Override
+    public boolean userAlreadyAppliedForCourse(int userId, String courseIdentifier) {
+        return applicationDao.userAlreadyAppliedForCourse(userId, courseIdentifier);
     }
 }

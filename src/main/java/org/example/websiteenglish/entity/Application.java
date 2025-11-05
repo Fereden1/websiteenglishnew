@@ -6,6 +6,7 @@ public class Application {
     private int id;
     private int userId;
     private String courseType;
+    private String courseIdentifier; // Конкретный идентификатор курса (например, "conversational-basic")
     private String studentName;
     private String email;
     private String phone;
@@ -31,6 +32,8 @@ public class Application {
     public void setUserId(int userId) { this.userId = userId; }
     public String getCourseType() { return courseType; }
     public void setCourseType(String courseType) { this.courseType = courseType; }
+    public String getCourseIdentifier() { return courseIdentifier; }
+    public void setCourseIdentifier(String courseIdentifier) { this.courseIdentifier = courseIdentifier; }
     public String getStudentName() { return studentName; }
     public void setStudentName(String studentName) { this.studentName = studentName; }
     public String getEmail() { return email; }

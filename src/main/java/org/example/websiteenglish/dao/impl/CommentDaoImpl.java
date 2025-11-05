@@ -33,7 +33,7 @@ public class CommentDaoImpl implements CommentDao {
     public List<Comment> findByCourse(String courseType) {
         List<Comment> comments = new ArrayList<>();
         String sql = """
-            SELECT c.id, c.text, c.created_at, c.course_type, u.name AS user_name
+            SELECT c.id, c.user_id, c.text, c.created_at, c.course_type, u.name AS user_name
             FROM comments c
             JOIN users u ON c.user_id = u.id
             WHERE c.course_type = ?
@@ -48,9 +48,10 @@ public class CommentDaoImpl implements CommentDao {
             while (rs.next()) {
                 Comment c = new Comment();
                 c.setId(rs.getInt("id"));
+                c.setUserId(rs.getInt("user_id"));
                 c.setText(rs.getString("text"));
                 c.setCreatedAt(rs.getTimestamp("created_at"));
-                c.setCourseType(rs.getString("course_type")); // <-- добавлено
+                c.setCourseType(rs.getString("course_type"));
                 c.setUserName(rs.getString("user_name"));
                 comments.add(c);
             }

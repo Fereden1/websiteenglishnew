@@ -1,51 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Home English School</title>
-    <link rel="stylesheet" href="style.css">
-    <script>
-        // Плавная прокрутка
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelectorAll('a[href^="#"]').forEach(link => {
-                link.addEventListener("click", function(e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute("href"));
-                    if (target) target.scrollIntoView({ behavior: "smooth" });
-                });
-            });
-        });
-    </script>
-</head>
-<body>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<c:set var="pageTitle" value="Home English School" scope="request" />
+<jsp:include page="/WEB-INF/fragments/header.jsp" />
 
-<!-- ===== HEADER ===== -->
-<header class="hdr">
-    <div class="wrap">
-        <div class="logo"><a href="#top">Home English School</a></div>
-
-        <nav class="menu">
-            <a href="#courses">Курсы</a>
-            <a href="#advantages">Преимущества</a>
-            <a href="#process">Как учим</a>
-            <a href="chat.jsp">Отзывы</a>
-        </nav>
-
-        <div class="auth">
-            <%
-                String userName = (String) session.getAttribute("userName");
-                if (userName != null) {
-            %>
-            <span>Привет, <a href="profile.jsp"><%= userName %></a></span>
-            <button class="btnn quit" onclick="window.location.href='logout'">Выйти</button>
-            <% } else { %>
-            <button class="btnn" onclick="window.location.href='register.jsp'">Регистрация</button>
-            <button class="btnn" onclick="window.location.href='login.jsp'">Войти</button>
-            <% } %>
-        </div>
-    </div>
-</header>
+<jsp:include page="/WEB-INF/fragments/messages.jsp" />
 
 <!-- ===== HERO ===== -->
 <section id="top" class="hero">
@@ -102,13 +60,13 @@
             <div class="frow">
                 <label for="userName">Ваше имя *</label>
                 <input type="text" id="userName" name="studentName" required
-                       value="<%= session.getAttribute("userName") != null ? session.getAttribute("userName") : "" %>">
+                       value="<c:out value='${sessionScope.userName != null ? sessionScope.userName : ""}' />">
             </div>
 
             <div class="frow">
                 <label for="userEmail">Email *</label>
                 <input type="email" id="userEmail" name="email" required
-                       value="<%= session.getAttribute("userEmail") != null ? session.getAttribute("userEmail") : "" %>">
+                       value="<c:out value='${sessionScope.userEmail != null ? sessionScope.userEmail : ""}' />">
             </div>
 
             <div class="frow">
@@ -178,12 +136,6 @@
     </div>
 </section>
 
-<footer class="foot">
-    <div class="wrap center">
-        <p>© 2025 Home English School</p>
-    </div>
-</footer>
-
 <script>
     // открытие модалки при клике на курс
     document.querySelectorAll(".course-card").forEach(card => {
@@ -209,5 +161,4 @@
     });
 </script>
 
-</body>
-</html>
+<jsp:include page="/WEB-INF/fragments/footer.jsp" />

@@ -5,23 +5,20 @@ import org.example.websiteenglish.entity.User;
 import java.util.List;
 
 public interface UserService {
-    List<UserDto> getAll();
+    List<UserDto> getAllUsers();
 
-    void signUp(String name, String email, String password); // если без картинки
-    // или, если с Cloudinary:
-    // void signUp(String name, String email, String password, Part imagePart) throws IOException;
+    void registerNewUser(String name, String email, String password);
     void updateUser(User user);
     void deleteUser(int id);
 
+    // Проверка пароля при входе
+    boolean checkPassword(String email, String password);
 
-    // Аутентификация
-    boolean authenticate(String email, String password);
-
-    // Проверка, существует ли логин/email
-    boolean loginExist(String email);
+    // Проверка, существует ли пользователь с таким email
     boolean emailExists(String email);
+    boolean loginExist(String email);
 
-    // Получение пользователя по email
+    // Найти пользователя по email
+    User findUserByEmail(String email);
     User findByLogin(String email);
-    User getByEmail(String email);
 }

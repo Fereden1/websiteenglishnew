@@ -4,14 +4,19 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import org.example.websiteenglish.service.CommentService;
-import org.example.websiteenglish.service.impl.CommentServiceImpl;
 
 import java.io.IOException;
 
 @WebServlet("/chat/send")
-public class ChatSendServlet extends HttpServlet {
+public class ChatSendServlet extends BaseServlet {
 
-    private final CommentService commentService = new CommentServiceImpl();
+    private CommentService commentService;
+    
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        this.commentService = getServiceContainer().getService(CommentService.class);
+    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)

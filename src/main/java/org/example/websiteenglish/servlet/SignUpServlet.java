@@ -6,14 +6,19 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.websiteenglish.service.UserService;
-import org.example.websiteenglish.service.impl.UserServiceImpl;
 
 import java.io.IOException;
 
 @WebServlet(name = "register", urlPatterns = "/register")
-public class SignUpServlet extends HttpServlet {
+public class SignUpServlet extends BaseServlet {
 
-    private final UserService userService = new UserServiceImpl();
+    private UserService userService;
+    
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        this.userService = getServiceContainer().getService(UserService.class);
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -36,7 +41,7 @@ public class SignUpServlet extends HttpServlet {
             req.setAttribute("error", "Пользователь с таким email уже существует");
             req.getRequestDispatcher("/register.jsp").forward(req, resp);
         } else {
-            userService.signUp(name, email, password);
+            userService.registerNewUser(name, email, password);
             // ✅ после успешной регистрации — на логин
             resp.sendRedirect("login");
         }
