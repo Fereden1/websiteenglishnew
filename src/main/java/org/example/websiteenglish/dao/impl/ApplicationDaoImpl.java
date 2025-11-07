@@ -78,7 +78,6 @@ public class ApplicationDaoImpl implements ApplicationDao {
 
     @Override
     public boolean userAlreadyAppliedForCourse(int userId, String courseIdentifier) {
-        // Проверяем, есть ли заявка с конкретным идентификатором курса
         String sql = "SELECT COUNT(*) FROM applications WHERE user_id = ? AND course_identifier = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, userId);

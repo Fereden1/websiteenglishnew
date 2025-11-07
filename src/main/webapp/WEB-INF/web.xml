@@ -5,8 +5,7 @@
                              https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
     <session-config>
-        <session-timeout>1</session-timeout> <!-- минуты -->
+        <session-timeout>1</session-timeout>
     </session-config>
-
 
 </web-app>

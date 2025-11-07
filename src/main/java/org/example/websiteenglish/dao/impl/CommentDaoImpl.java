@@ -17,7 +17,7 @@ public class CommentDaoImpl implements CommentDao {
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, comment.getUserId());
-            stmt.setString(2, comment.getCourseType()); // <-- исправлено
+                    stmt.setString(2, comment.getCourseType());
             stmt.setString(3, comment.getText());
             stmt.executeUpdate();
 

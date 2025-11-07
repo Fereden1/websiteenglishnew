@@ -5,13 +5,11 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 import org.example.websiteenglish.container.ServiceContainer;
+import org.example.websiteenglish.utils.DatabaseConnectionUtil;
+import org.example.websiteenglish.utils.FreeMarkerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * WebListener для инициализации контейнера сервисов при старте приложения
- * Реализует принцип Dependency Injection через ServiceContainer
- */
 @WebListener
 public class ApplicationContextListener implements ServletContextListener {
     
@@ -21,20 +19,16 @@ public class ApplicationContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext context = sce.getServletContext();
         
-        logger.info("Initializing application context...");
-        
         try {
-            // Инициализация контейнера сервисов
             ServiceContainer container = ServiceContainer.getInstance();
-            
-            // Сохранение контейнера в ServletContext для доступа из сервлетов
             context.setAttribute("serviceContainer", container);
-            
             logger.info("Service container initialized successfully");
             logger.info("Registered services: UserService, ApplicationService, CommentService");
+            FreeMarkerUtil.init(context);
+            logger.info("FreeMarker initialized successfully");
             
         } catch (Exception e) {
-            logger.error("Failed to initialize service container", e);
+            logger.error("Failed to initialize application context", e);
             throw new RuntimeException("Application initialization failed", e);
         }
     }
@@ -42,7 +36,12 @@ public class ApplicationContextListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         logger.info("Application context is being destroyed...");
-        // Очистка ресурсов при необходимости
+        try {
+            DatabaseConnectionUtil.closeAllConnections();
+            logger.info("All database connections closed");
+        } catch (Exception e) {
+            logger.warn("Failed to close some database connections", e);
+        }
     }
 }
 

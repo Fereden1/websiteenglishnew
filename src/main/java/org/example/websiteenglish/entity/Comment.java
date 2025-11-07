@@ -3,14 +3,13 @@ package org.example.websiteenglish.entity;
 import java.sql.Timestamp;
 
 public class Comment {
+
     private int id;
     private int userId;
     private String text;
     private Timestamp createdAt;
-    private String courseType; // <-- добавляем поле
-    private String userName;   // для удобства отображения имени пользователя
-
-    // Геттеры и сеттеры
+    private String courseType;
+    private String userName;
     public int getId() {
         return id;
     }

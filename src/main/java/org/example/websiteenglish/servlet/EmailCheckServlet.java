@@ -20,14 +20,14 @@ public class EmailCheckServlet extends HttpServlet {
         resp.setContentType("text/plain; charset=UTF-8");
 
         if (email == null || email.isEmpty()) {
-            resp.getWriter().write(""); // пусто, если поле пустое
+            resp.getWriter().write("");
             return;
         }
 
         if (!userService.emailExists(email)) {
-            resp.getWriter().write(""); // свободно
+            resp.getWriter().write("");
         } else {
-            resp.getWriter().write("Этот email уже зарегистрирован!"); // занят
+            resp.getWriter().write("Этот email уже зарегистрирован!");
         }
     }
 }

@@ -14,12 +14,10 @@ public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
     
-    // Конструктор для Dependency Injection
     public UserServiceImpl(UserDao userDao) {
         this.userDao = userDao;
     }
     
-    // Конструктор по умолчанию для обратной совместимости
     public UserServiceImpl() {
         this.userDao = new UserDaoImpl();
     }

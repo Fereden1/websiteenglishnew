@@ -1,11 +1,7 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<c:set var="pageTitle" value="Home English School" scope="request" />
-<jsp:include page="/WEB-INF/fragments/header.jsp" />
+<#assign pageTitle = "Home English School" />
+<#assign extraScripts = ["index.js"] />
+<#include "fragments/header.ftl" />
 
-<jsp:include page="/WEB-INF/fragments/messages.jsp" />
-
-<!-- ===== HERO ===== -->
 <section id="top" class="hero">
     <div class="wrap center">
         <h1>Изучайте английский легко и с удовольствием!</h1>
@@ -14,7 +10,6 @@
     </div>
 </section>
 
-<!-- ===== COURSES ===== -->
 <section id="courses" class="section">
     <div class="wrap center">
         <h2>Выберите курс</h2>
@@ -48,10 +43,9 @@
     </div>
 </section>
 
-<!-- ===== MODAL FORM ===== -->
 <div id="applicationModal" class="modal hidden">
     <div class="modal-inner">
-        <span class="close" onclick="closeModal()">&times;</span>
+        <button type="button" class="close" aria-label="Закрыть форму">&times;</button>
         <h3 id="modalTitle">Оставить заявку</h3>
 
         <form id="applicationForm" method="post" action="submitApplication">
@@ -60,13 +54,13 @@
             <div class="frow">
                 <label for="userName">Ваше имя *</label>
                 <input type="text" id="userName" name="studentName" required
-                       value="<c:out value='${sessionScope.userName != null ? sessionScope.userName : ""}' />">
+                       value="${(userName!)?default('')}">
             </div>
 
             <div class="frow">
                 <label for="userEmail">Email *</label>
                 <input type="email" id="userEmail" name="email" required
-                       value="<c:out value='${sessionScope.userEmail != null ? sessionScope.userEmail : ""}' />">
+                       value="${(userEmail!)?default('')}">
             </div>
 
             <div class="frow">
@@ -85,7 +79,6 @@
     </div>
 </div>
 
-<!-- ===== ADVANTAGES ===== -->
 <section id="advantages" class="section alt">
     <div class="wrap">
         <h2>Почему выбирают нас</h2>
@@ -98,7 +91,6 @@
     </div>
 </section>
 
-<!-- ===== PROCESS ===== -->
 <section id="process" class="section">
     <div class="wrap">
         <h2>Как проходит обучение</h2>
@@ -136,29 +128,5 @@
     </div>
 </section>
 
-<script>
-    // открытие модалки при клике на курс
-    document.querySelectorAll(".course-card").forEach(card => {
-        card.addEventListener("click", () => {
-            const course = card.dataset.course;
-            document.getElementById("selectedCourseId").value = course;
-            document.getElementById("modalTitle").innerText = "Заявка на курс: " + card.querySelector("h3").textContent;
-            document.getElementById("applicationModal").classList.remove("hidden");
-        });
-    });
+<#include "fragments/footer.ftl" />
 
-    function closeModal() {
-        document.getElementById("applicationModal").classList.add("hidden");
-    }
-
-    // простая валидация
-    document.getElementById("applicationForm").addEventListener("submit", function(e) {
-        const phone = document.getElementById("userPhone").value.trim();
-        if (!/^\+7\d{10}$/.test(phone)) {
-            e.preventDefault();
-            alert("Телефон должен быть в формате +7XXXXXXXXXX");
-        }
-    });
-</script>
-
-<jsp:include page="/WEB-INF/fragments/footer.jsp" />

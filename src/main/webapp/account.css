@@ -1,0 +1,131 @@
+.account-container {
+    width: 100%;
+    max-width: 420px;
+    margin: 60px auto;
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
+}
+
+.account-container h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.account-info p {
+    margin: 8px 0;
+}
+
+.account-actions {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.account-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border-radius: 8px;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.account-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+}
+
+.account-button--home { background: #28a745; }
+.account-button--edit { background: #0d6efd; }
+.account-button--delete { background: #dc3545; }
+.account-button--logout { background: #6c757d; }
+
+.account-button--home:hover { background: #218838; }
+.account-button--edit:hover { background: #0056b3; }
+.account-button--delete:hover { background: #c82333; }
+.account-button--logout:hover { background: #5a6268; }
+
+.account-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.account-form input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #d0d0d0;
+    margin-bottom: 16px;
+    font-size: 14px;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.account-form input[readonly] {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.account-form input:focus {
+    outline: none;
+    border-color: #0d6efd;
+}
+
+.account-form button {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #0d6efd, #004aad);
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.account-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(13, 110, 253, 0.25);
+}
+
+.account-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.account-form-cancel {
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.account-form-cancel:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+    .account-container {
+        margin: 20px;
+        padding: 20px;
+    }
+    
+    .account-form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .account-form-actions button {
+        width: 100%;
+    }
+}
+

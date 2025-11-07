@@ -11,12 +11,10 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentDao commentDao;
     
-    // Конструктор для Dependency Injection
     public CommentServiceImpl(CommentDao commentDao) {
         this.commentDao = commentDao;
     }
     
-    // Конструктор по умолчанию для обратной совместимости
     public CommentServiceImpl() {
         this.commentDao = new CommentDaoImpl();
     }

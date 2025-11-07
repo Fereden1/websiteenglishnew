@@ -1,14 +1,16 @@
 package org.example.websiteenglish.servlet;
 
+import freemarker.template.TemplateException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import org.example.websiteenglish.entity.User;
 import org.example.websiteenglish.service.UserService;
+import org.example.websiteenglish.utils.FreeMarkerUtil;
 import org.example.websiteenglish.utils.PasswordUtil;
 
-
 import java.io.IOException;
+import java.util.Map;
 
 @WebServlet(name = "profileServlet", urlPatterns = {"/profile", "/profile/edit", "/profile/delete"})
 public class ProfileServlet extends BaseServlet {
@@ -27,7 +29,7 @@ public class ProfileServlet extends BaseServlet {
 
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("userEmail") == null) {
-            resp.sendRedirect("login.jsp");
+            resp.sendRedirect("login");
             return;
         }
 
@@ -35,21 +37,25 @@ public class ProfileServlet extends BaseServlet {
         User user = userService.findUserByEmail(email);
 
         String path = req.getServletPath();
-        switch (path) {
-            case "/profile":
-                req.setAttribute("user", user);
-                req.getRequestDispatcher("profile.jsp").forward(req, resp);
-                break;
-            case "/profile/edit":
-                req.setAttribute("user", user);
-                req.getRequestDispatcher("/editProfile.jsp").forward(req, resp);
-                break;
-
-            case "/profile/delete":
-                userService.deleteUser(user.getId());
-                session.invalidate();
-                resp.sendRedirect("index.jsp");
-                break;
+        try {
+            Map<String, Object> model = FreeMarkerUtil.createDataModel(req);
+            model.put("user", user);
+            
+            switch (path) {
+                case "/profile":
+                    FreeMarkerUtil.renderTemplate("profile.ftl", model, resp);
+                    break;
+                case "/profile/edit":
+                    FreeMarkerUtil.renderTemplate("editProfile.ftl", model, resp);
+                    break;
+                case "/profile/delete":
+                    userService.deleteUser(user.getId());
+                    session.invalidate();
+                    resp.sendRedirect("index");
+                    break;
+            }
+        } catch (TemplateException e) {
+            throw new ServletException("Error rendering template", e);
         }
     }
 
@@ -59,12 +65,11 @@ public class ProfileServlet extends BaseServlet {
 
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("userEmail") == null) {
-            resp.sendRedirect("login.jsp");
+            resp.sendRedirect("login");
             return;
         }
 
         String email = (String) session.getAttribute("userEmail");
-
         User currentUser = userService.findUserByEmail(email);
 
         String name = req.getParameter("name");
@@ -72,16 +77,19 @@ public class ProfileServlet extends BaseServlet {
 
         currentUser.setName(name);
         if (password != null && !password.isEmpty()) {
-            currentUser.setPassword(PasswordUtil.encrypt(password)); // хешируем пароль
+            currentUser.setPassword(PasswordUtil.encrypt(password));
         }
 
         userService.updateUser(currentUser);
-
         session.setAttribute("userEmail", currentUser.getEmail());
 
-        // вместо редиректа — forward на профиль
-        req.setAttribute("user", currentUser);
-        req.getRequestDispatcher("/profile.jsp").forward(req, resp);
+        try {
+            Map<String, Object> model = FreeMarkerUtil.createDataModel(req);
+            model.put("user", currentUser);
+            FreeMarkerUtil.renderTemplate("profile.ftl", model, resp);
+        } catch (TemplateException e) {
+            throw new ServletException("Error rendering template", e);
+        }
     }
 
 

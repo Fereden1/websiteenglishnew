@@ -20,21 +20,19 @@ public class LoginFilter implements Filter {
 
         boolean loggedIn = session != null && session.getAttribute("userId") != null;
 
-        boolean publicPage =
+        boolean isStaticResource = uri.matches(".*\\.(css|js|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|ico)$");
+        boolean isPublicEndpoint =
                 uri.equals("/") ||
-                        uri.endsWith("/login") ||
-                        uri.endsWith("login.jsp") ||
-                        uri.endsWith("/register") ||
-                        uri.endsWith("register.jsp") ||
-                        uri.matches(".*\\.(css|js|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot|ico)$");
+                uri.endsWith("/login") ||
+                uri.endsWith("/register");
 
-        // ✅ Если пользователь не авторизован и это не public — редиректим на login
+        boolean publicPage = isStaticResource || isPublicEndpoint;
+
         if (!loggedIn && !publicPage) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
-        // ✅ Если он пришёл на "/" и он не авторизован — редирект на login
         if (!loggedIn && uri.equals("/")) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;

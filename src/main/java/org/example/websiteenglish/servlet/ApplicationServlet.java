@@ -23,10 +23,9 @@ public class ApplicationServlet extends BaseServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
 
-        // Проверка сессии
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("userId") == null) {
-            resp.sendRedirect("login.jsp"); // если нет сессии, перенаправляем на логин
+            resp.sendRedirect("login");
             return;
         }
 
@@ -37,45 +36,38 @@ public class ApplicationServlet extends BaseServlet {
         String courseTypeRaw = req.getParameter("courseType");
         String message = req.getParameter("message");
 
-        // Определяем, является ли courseTypeRaw конкретным идентификатором или обобщенным типом
         String courseType;
         String courseIdentifier;
         
         if (courseTypeRaw != null && (courseTypeRaw.contains("-") || courseTypeRaw.equals("conversational-basic") || 
                 courseTypeRaw.equals("conversational-advanced") || courseTypeRaw.equals("aviation-pilots") || 
                 courseTypeRaw.equals("aviation-dispatchers"))) {
-            // Это конкретный идентификатор курса
             courseIdentifier = courseTypeRaw;
-            // Преобразуем в обобщенный тип для БД
             if (courseTypeRaw.startsWith("conversational")) {
                 courseType = "CONVERSATIONAL";
             } else if (courseTypeRaw.startsWith("aviation")) {
                 courseType = "AVIATION";
             } else {
-                courseType = courseTypeRaw; // Оставляем как есть, если не распознано
+                courseType = courseTypeRaw;
             }
         } else {
-            // Это обобщенный тип (CONVERSATIONAL или AVIATION)
             courseType = courseTypeRaw;
-            courseIdentifier = courseTypeRaw; // Используем как идентификатор
+            courseIdentifier = courseTypeRaw;
         }
 
-        // Проверка на дубликат заявки по конкретному идентификатору
         if (applicationService.userAlreadyAppliedForCourse(userId, courseIdentifier)) {
             session.setAttribute("errorMessage", "Вы уже отправили заявку на этот курс. Пожалуйста, выберите другой курс.");
-            resp.sendRedirect("profile.jsp");
+            resp.sendRedirect("profile");
             return;
         }
 
-        // Создаем объект заявки
         Application application = new Application(userId, courseType, name, email, phone, message);
-        application.setCourseIdentifier(courseIdentifier); // Устанавливаем конкретный идентификатор курса
+        application.setCourseIdentifier(courseIdentifier);
 
         try {
-            // Сохраняем в базу
             applicationService.save(application);
             session.setAttribute("successMessage", "Заявка успешно отправлена!");
-            resp.sendRedirect("profile.jsp"); // после успешной отправки
+            resp.sendRedirect("profile");
         } catch (Exception ex) {
             ex.printStackTrace();
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Ошибка при сохранении заявки.");

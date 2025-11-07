@@ -1,16 +1,19 @@
-/* Общие стили для логина и регистрации */
-body {
+.auth-layout {
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(to right, #4facfe, #00f2fe);
-    height: 100vh;
+    min-height: 100vh;
+}
+
+.auth-page {
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 80px 20px;
 }
 
-.container {
+.auth-page .container {
     background: #fff;
     padding: 40px 50px;
     border-radius: 12px;
@@ -19,24 +22,25 @@ body {
     max-width: 400px;
 }
 
-.container h2 {
+.auth-page .container h2 {
     text-align: center;
     margin-bottom: 30px;
     color: #333;
 }
 
-.container form {
+.auth-page .container form {
     display: flex;
     flex-direction: column;
 }
 
-.container label {
+.auth-page .container label {
     margin-bottom: 5px;
     font-weight: 500;
     color: #555;
 }
 
-.container input, .container textarea {
+.auth-page .container input,
+.auth-page .container textarea {
     margin-bottom: 20px;
     padding: 10px 15px;
     border-radius: 8px;
@@ -46,11 +50,12 @@ body {
     transition: border-color 0.2s;
 }
 
-.container input:focus, .container textarea:focus {
+.auth-page .container input:focus,
+.auth-page .container textarea:focus {
     border-color: #4facfe;
 }
 
-.container input[type="submit"] {
+.auth-page .container input[type="submit"] {
     background: linear-gradient(to right, #4facfe, #00f2fe);
     color: #fff;
     font-weight: bold;
@@ -59,22 +64,22 @@ body {
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.container input[type="submit"]:hover {
+.auth-page .container input[type="submit"]:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-.container a {
+.auth-page .container a {
     color: #4facfe;
     text-decoration: none;
     text-align: center;
 }
 
-.container a:hover {
+.auth-page .container a:hover {
     text-decoration: underline;
 }
 
-#errorMsg {
+.auth-page #errorMsg {
     color: #dc3545;
     margin-bottom: 15px;
     text-align: center;

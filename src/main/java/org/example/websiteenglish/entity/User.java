@@ -8,7 +8,6 @@ public class User {
     private String name;
     private String role;
 
-    // Конструктор для чтения из БД
     public User(Integer id, String email, String password, String name, String role) {
         this.id = id;
         this.email = email;
@@ -17,19 +16,16 @@ public class User {
         this.role = role != null ? role : "USER";
     }
 
-    // Конструктор для создания нового пользователя
     public User(String email, String password, String name) {
         this(null, email, password, name, "USER");
     }
 
-    // Геттеры
     public Integer getId() { return id; }
     public String getEmail() { return email; }
     public String getPassword() { return password; }
     public String getName() { return name; }
     public String getRole() { return role; }
 
-    // Сеттеры
     public void setId(int id) { this.id = id; }
     public void setEmail(String email) { this.email = email; }
     public void setPassword(String password) { this.password = password; }

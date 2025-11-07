@@ -25,7 +25,7 @@ public class SubmitApplicationServlet extends BaseServlet {
 
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("userId") == null) {
-            resp.sendRedirect("login.jsp");
+            resp.sendRedirect("login");
             return;
         }
 
@@ -36,7 +36,6 @@ public class SubmitApplicationServlet extends BaseServlet {
         String phone = req.getParameter("phone");
         String message = req.getParameter("message");
 
-        // --- преобразуем raw значение в допустимое для БД ---
         String courseType;
         if (courseTypeRaw.startsWith("conversational")) {
             courseType = "CONVERSATIONAL";
@@ -47,17 +46,16 @@ public class SubmitApplicationServlet extends BaseServlet {
             throw new IllegalArgumentException("Неверный тип курса");
         }
 
-        // Проверка на дубликат заявки по конкретному идентификатору курса
         if (applicationService.userAlreadyAppliedForCourse(userId, courseTypeRaw)) {
             session.setAttribute("errorMessage", "Вы уже отправили заявку на этот курс. Пожалуйста, выберите другой курс.");
-            resp.sendRedirect("index.jsp");
+            resp.sendRedirect("index");
             return;
         }
 
         Application app = new Application();
         app.setUserId(userId);
         app.setCourseType(courseType);
-        app.setCourseIdentifier(courseTypeRaw); // Сохраняем конкретный идентификатор курса
+        app.setCourseIdentifier(courseTypeRaw);
         app.setStudentName(studentName);
         app.setEmail(email);
         app.setPhone(phone);
@@ -66,6 +64,6 @@ public class SubmitApplicationServlet extends BaseServlet {
         applicationService.save(app);
 
         session.setAttribute("successMessage", "Заявка успешно отправлена!");
-        resp.sendRedirect("index.jsp");
+        resp.sendRedirect("index");
     }
 }

@@ -11,12 +11,10 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private final ApplicationDao applicationDao;
     
-    // Конструктор для Dependency Injection
     public ApplicationServiceImpl(ApplicationDao applicationDao) {
         this.applicationDao = applicationDao;
     }
     
-    // Конструктор по умолчанию для обратной совместимости
     public ApplicationServiceImpl() {
         this.applicationDao = new ApplicationDaoImpl();
     }
